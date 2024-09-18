@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ProductRepository extends JpaRepository<ProductModel, Long> {
-
     @Query(value = "SELECT * FROM product WHERE category_id = :cod", nativeQuery = true)
     List<ProductModel> findByCategory(@Param("cod") Long cod);
 }

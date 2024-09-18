@@ -21,7 +21,7 @@ import java.util.List;
 @Service
 public class ProductService {
 
-    private Logger LOGGER = LoggerFactory.getLogger(ProductService.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(ProductService.class);
 
     @Autowired
     private ProductRepository productRepository;

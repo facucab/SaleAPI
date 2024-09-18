@@ -2,6 +2,7 @@ package com.salesmanager.SalesManager.services;
 
 import com.salesmanager.SalesManager.dto.SaleDto;
 import com.salesmanager.SalesManager.exception.CustomerNotFoundException;
+import com.salesmanager.SalesManager.exception.EmptyProductListException;
 import com.salesmanager.SalesManager.exception.OutOfStockException;
 import com.salesmanager.SalesManager.exception.SaleNotFoundException;
 import com.salesmanager.SalesManager.models.CustomerModel;
@@ -13,24 +14,35 @@ import com.salesmanager.SalesManager.repositorys.SaleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class SaleService {
 
-    @Autowired
-    private SaleRepository saleRepository;
+
+    private final SaleRepository saleRepository;
+
+
+    private final CustomerRepository customerRepository;
+
+
+    private final ProductRepository productRepository;
+
+    private final Logger LOGGER = LoggerFactory.getLogger(SaleService.class);
 
     @Autowired
-    private CustomerRepository customerRepository;
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    private Logger LOGGER = LoggerFactory.getLogger(SaleService.class);
+    public SaleService(SaleRepository saleRepository, CustomerRepository customerRepository, ProductRepository productRepository) {
+        this.saleRepository = saleRepository;
+        this.customerRepository = customerRepository;
+        this.productRepository = productRepository;
+    }
 
     @Transactional
     public SaleDto createSale(SaleDto sale)
@@ -46,8 +58,8 @@ public class SaleService {
 
         if(productModels.isEmpty())
         {
-            //tirar excepcion
-            LOGGER.info("La lista esta vacias");
+            LOGGER.info("List is empty");
+            throw new EmptyProductListException("The product list is empty.");
         }
         //
         productModels.forEach(
@@ -63,7 +75,7 @@ public class SaleService {
                     );
                 }
         );
-        //
+
         SaleModel saleDB  = new SaleModel(
                 sale.getDescription(),
                 sale.getPrice(),
@@ -76,12 +88,14 @@ public class SaleService {
         return sale;
     }
 
+
     @Transactional(readOnly = true)
-    public List<SaleModel> allSale()
+    public Page<SaleModel> allSale(Pageable pageable)
     {
-        return saleRepository.findAll();
+        return  saleRepository.findAll(pageable);
     }
 
+    @Transactional(readOnly = true)
     public SaleModel getSaleById(Long id)
     {
         return saleRepository.findById(id)
@@ -95,7 +109,8 @@ public class SaleService {
     {
         saleRepository.deleteById(id);
     }
-    @Transactional
+
+    @Transactional(readOnly = true)
     public List<SaleModel> filterSaleByDate(LocalDate initialDate, LocalDate endDate)
     {
         return saleRepository.filterSaleByDate(initialDate, endDate);

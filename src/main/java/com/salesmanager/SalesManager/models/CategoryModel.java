@@ -13,6 +13,8 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@ToString
 public class CategoryModel {
 
     @Id

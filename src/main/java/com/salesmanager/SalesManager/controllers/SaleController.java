@@ -1,9 +1,12 @@
 package com.salesmanager.SalesManager.controllers;
 import com.salesmanager.SalesManager.dto.SaleDto;
 import com.salesmanager.SalesManager.models.SaleModel;
-import com.salesmanager.SalesManager.repositorys.SaleRepository;
 import com.salesmanager.SalesManager.services.SaleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,26 +16,31 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/sale")
+@RequestMapping("/sales")
 public class SaleController {
 
     @Autowired
     private SaleService saleService;
-    @Autowired
-    private SaleRepository saleRepository;
 
-    @PostMapping("/create")
-    public SaleDto createSale(@RequestBody SaleDto sale)
+    @PostMapping
+    public ResponseEntity<SaleDto> createSale(@RequestBody SaleDto sale)
     {
-        return saleService.createSale(sale);
+        return  ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(saleService.createSale(sale)
+                );
     }
 
     @GetMapping("/all")
-    public ResponseEntity< List<SaleModel> > allSale()
+    public ResponseEntity<Page<SaleModel>> allSale(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "5") int size
+    )
     {
+        Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
-                        saleService.allSale()
+                        saleService.allSale(pageable)
                 );
     }
 

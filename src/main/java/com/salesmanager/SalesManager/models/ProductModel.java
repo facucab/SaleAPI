@@ -10,6 +10,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
+@Builder
+@ToString
 public class ProductModel {
     @Id
     private Long CodPro;
@@ -24,7 +26,7 @@ public class ProductModel {
     private int stock;
 
     @ManyToOne(
-            fetch = FetchType.LAZY
+            fetch = FetchType.EAGER
     )
     @JoinColumn(
             name = "category_id"

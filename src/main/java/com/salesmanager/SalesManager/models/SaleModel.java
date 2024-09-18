@@ -12,6 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter @Setter
+@ToString
+@Builder
 public class SaleModel {
     @Id
     @GeneratedValue (strategy =  GenerationType.IDENTITY)
@@ -28,7 +30,8 @@ public class SaleModel {
 
     @ManyToOne
             (
-                    cascade = CascadeType.MERGE
+                    cascade = CascadeType.MERGE,
+                    fetch = FetchType.EAGER
             )
     @JoinColumn(
             name = "customer_id"
@@ -36,7 +39,8 @@ public class SaleModel {
     private CustomerModel customer;
     @ManyToMany
             (
-                    cascade = CascadeType.MERGE
+                    cascade = CascadeType.MERGE,
+                    fetch = FetchType.EAGER
             )
     @JoinTable(
                 name = "sale_product",
